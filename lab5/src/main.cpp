@@ -53,6 +53,7 @@ void emaADC(void);
 void valores(void);
 void mapeo(void);
 void leds(void);
+void uart(void);
 //*****************************************************************************
 //Varibles globales
 //*****************************************************************************
@@ -74,16 +75,23 @@ uint8_t centena1, decena1, unidad1; //Led Rojo
 uint8_t centena2, decena2, unidad2; //Led Verde
 uint8_t centena3, decena3, unidad3; //Led Azul
 
+//UART
+byte mensaje = 0;
+
 //*****************************************************************************
 //configuracion
 //*****************************************************************************
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("Hola!");
+  Serial.println("Ingresa + para aumentar brillo del led azul.");
+  Serial.println("Ingresa - para disminuir brillo del led azul.");
+
   configurarPWMLedR();
   configurarPWMLedA();
   configurarPWMLedV();
 
-  Serial.begin(115200);
   LCD.begin(16, 2);
 }
 
@@ -92,13 +100,12 @@ void setup()
 //*****************************************************************************
 void loop()
 {
-  //emaADC();
+  uart();
+  emaADC();
   mapeo();
   valores();
   leds();
 
-  Serial.print(rojo);
-  Serial.println(verde);
   LCD.setCursor(0, 0);
   LCD.print("Rojo");
   LCD.setCursor(0, 1);
@@ -165,9 +172,9 @@ void emaADC(void)
   adcRaw1 = analogRead(Potenciometro1); //toma valor que está midiendo el potenciometro
   adcRaw2 = analogRead(Potenciometro2); //toma valor que está midiendo el potenciometro
 
-  //rojoFiltrado = (alpha * adcRaw1) + ((1.0 - alpha) * rojoFiltrado); //filtra ese valor
+  rojoFiltrado = (alpha * adcRaw1) + ((1.0 - alpha) * rojoFiltrado); //filtra ese valor
 
-  //verdeFiltrado = (alpha * adcRaw2) + ((1.0 - alpha) * verdeFiltrado); //filtra ese valor
+  verdeFiltrado = (alpha * adcRaw2) + ((1.0 - alpha) * verdeFiltrado); //filtra ese valor
 }
 
 //****************************************************************
@@ -175,8 +182,8 @@ void emaADC(void)
 //****************************************************************
 void mapeo(void)
 {
-  rojo = map(analogRead(Potenciometro1), 0, 4095, 0, 255);
-  verde = map(analogRead(Potenciometro2), 0, 4095, 0, 255);
+  rojo = map(rojoFiltrado, 0, 4095, 0, 255);
+  verde = map(verdeFiltrado, 0, 4095, 0, 255);
 }
 
 //****************************************************************
@@ -217,4 +224,42 @@ void leds(void)
   ledcWrite(pwmChannelLedR, rojo);
   ledcWrite(pwmChannelLedV, verde);
   ledcWrite(pwmChannelLedA, azul);
+}
+
+//****************************************************************
+// Lectura de computadora
+//****************************************************************
+void uart(void)
+{
+  if (Serial.available() > 0)
+  {
+    mensaje = Serial.read();
+
+    Serial.print("Recibi el siguiente mensaje: ");
+    Serial.println(mensaje);
+  }
+
+  if (mensaje == '+')
+  {
+    azul++;
+
+    if (azul > 255)
+    {
+      azul = 0;
+    }
+
+    mensaje = 0;
+  }
+
+  else if (mensaje == '-')
+  {
+    azul = azul - 1;
+
+    if (azul < 0)
+    {
+      azul = 255;
+    }
+    mensaje = 0;
+  }
+
 }
