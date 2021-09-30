@@ -84,9 +84,9 @@ byte mensaje = 0;
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Hola!");
-  Serial.println("Ingresa + para aumentar brillo del led azul.");
-  Serial.println("Ingresa - para disminuir brillo del led azul.");
+  Serial.println("\nHola!");
+  Serial.println("Presiona + para aumentar brillo del led azul.");
+  Serial.println("Presiona - para disminuir brillo del led azul.");
 
   configurarPWMLedR();
   configurarPWMLedA();
