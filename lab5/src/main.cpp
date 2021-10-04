@@ -54,6 +54,7 @@ void valores(void);
 void mapeo(void);
 void leds(void);
 void uart(void);
+
 //*****************************************************************************
 //Varibles globales
 //*****************************************************************************
@@ -84,6 +85,7 @@ byte mensaje = 0;
 void setup()
 {
   Serial.begin(115200);
+
   Serial.println("\nHola!");
   Serial.println("Presiona + para aumentar brillo del led azul.");
   Serial.println("Presiona - para disminuir brillo del led azul.");
@@ -236,7 +238,9 @@ void uart(void)
     mensaje = Serial.read();
 
     Serial.print("Recibi el siguiente mensaje: ");
-    Serial.println(mensaje);
+    //Serial.println(mensaje);
+    Serial.write(mensaje);
+    Serial.write('\n');
   }
 
   if (mensaje == '+')
@@ -261,5 +265,4 @@ void uart(void)
     }
     mensaje = 0;
   }
-
 }
