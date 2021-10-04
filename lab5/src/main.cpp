@@ -238,7 +238,6 @@ void uart(void)
     mensaje = Serial.read();
 
     Serial.print("Recibi el siguiente mensaje: ");
-    //Serial.println(mensaje);
     Serial.write(mensaje);
     Serial.write('\n');
   }
